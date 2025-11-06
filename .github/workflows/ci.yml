@@ -152,7 +152,12 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bundle exec rspec spec/system
+        run: |
+          if [ -n "$(find spec/system -name '*_spec.rb' 2>/dev/null)" ]; then
+            bundle exec rspec spec/system
+          else
+            echo "No system specs found yet - skipping"
+          fi
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v5
