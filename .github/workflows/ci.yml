@@ -7,6 +7,7 @@ on:
 
 jobs:
   scan_ruby:
+    name: "Security: Ruby Gems & Rails (Brakeman + Bundler Audit)"
     runs-on: ubuntu-latest
 
     steps:
@@ -18,13 +19,14 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Scan for common Rails security vulnerabilities using static analysis
+      - name: Scan for Rails security vulnerabilities (Brakeman)
         run: bin/brakeman --no-pager
       
-      - name: Scan for known security vulnerabilities in gems used
+      - name: Scan for vulnerable gem dependencies (Bundler Audit)
         run: bin/bundler-audit
       
   scan_js:
+    name: "Security: JavaScript Dependencies (Importmap Audit)"
     runs-on: ubuntu-latest
 
     steps:
@@ -36,10 +38,11 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Scan for security vulnerabilities in JavaScript dependencies
+      - name: Scan for JavaScript vulnerabilities (Importmap)
         run: bin/importmap audit
 
   lint:
+    name: "Code Quality: Linting (RuboCop)"
     runs-on: ubuntu-latest
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
@@ -62,10 +65,11 @@ jobs:
           restore-keys: |
             rubocop-${{ runner.os }}-${{ env.DEPENDENCIES_HASH }}-
 
-      - name: Lint code for consistent style
+      - name: Lint Ruby code (RuboCop)
         run: bin/rubocop -f github
 
   test:
+    name: "Tests: Unit & Integration (PostgreSQL 18)"
     runs-on: ubuntu-latest
 
     services:
@@ -93,15 +97,22 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run tests
+      - name: Prepare test database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
+        run: bin/rails db:test:prepare
+
+      - name: Run unit & integration tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test
+        run: bin/rails test
 
   system-test:
+    name: "Tests: System/E2E (Browser + PostgreSQL 18)"
     runs-on: ubuntu-latest
 
     services:
@@ -129,13 +140,19 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Run System Tests
+      - name: Prepare test database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
+        run: bin/rails db:test:prepare
+
+      - name: Run system tests (browser-based)
         env:
           RAILS_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:test:prepare test:system
+        run: bin/rails test:system
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v5
