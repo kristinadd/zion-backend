@@ -69,7 +69,7 @@ jobs:
         run: bin/rubocop -f github
 
   test:
-    name: "Tests: Unit & Integration (PostgreSQL 18)"
+    name: "Tests: Unit & Integration (RSpec + PostgreSQL 18)"
     runs-on: ubuntu-latest
 
     services:
@@ -103,16 +103,16 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
         run: bin/rails db:test:prepare
 
-      - name: Run unit & integration tests
+      - name: Run RSpec tests (unit & integration)
         env:
           RAILS_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails test
+        run: bundle exec rspec --exclude-pattern "spec/system/**/*_spec.rb"
 
   system-test:
-    name: "Tests: System/E2E (Browser + PostgreSQL 18)"
+    name: "Tests: System/E2E (RSpec + Browser + PostgreSQL 18)"
     runs-on: ubuntu-latest
 
     services:
@@ -146,13 +146,18 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
         run: bin/rails db:test:prepare
 
-      - name: Run system tests (browser-based)
+      - name: Run RSpec system tests (browser-based)
         env:
           RAILS_ENV: test
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/zion_backend_test
           # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           # REDIS_URL: redis://localhost:6379/0
-        run: bin/rails test:system
+        run: |
+          if [ -n "$(find spec/system -name '*_spec.rb' 2>/dev/null)" ]; then
+            bundle exec rspec spec/system
+          else
+            echo "No system specs found yet - skipping"
+          fi
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v5
