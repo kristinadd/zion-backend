@@ -14,6 +14,12 @@ require 'rspec/rails'
 require 'capybara/rails'
 require 'capybara/rspec'
 
+# Require WebMock for HTTP request stubbing
+require 'webmock/rspec'
+
+# Configure WebMock to allow real HTTP requests for system tests
+WebMock.disable_net_connect!(allow_localhost: true)
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end

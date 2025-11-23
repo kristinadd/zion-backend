@@ -84,4 +84,7 @@ group :test do
 
   # Database cleaner for test isolation [https://github.com/DatabaseCleaner/database_cleaner]
   gem "database_cleaner-active_record", "~> 2.2"
+
+  # HTTP request stubbing for tests [https://github.com/bblimke/webmock]
+  gem "webmock", "~> 3.24"
 end
