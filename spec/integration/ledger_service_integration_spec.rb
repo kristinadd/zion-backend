@@ -19,7 +19,7 @@ RSpec.describe "LedgerService Integration", type: :integration do
         expect(result[:success]).to be true
         expect(result[:data]).to have_key("balances")
         expect(result[:data]["balances"]).to be_an(Array)
-        
+
         expect(result[:data]["balances"]).to include(
           "customer_facing_balance",
           "interest_chargeable_balance"

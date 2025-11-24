@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe LedgerService,type: :service do
+RSpec.describe LedgerService, type: :service do
   let(:service) { described_class.new }
 
   describe "#available_balances" do
@@ -196,12 +196,12 @@ RSpec.describe LedgerService,type: :service do
       around do |example|
         original_url = ENV["LEDGER_SERVICE_URL"]
         ENV["LEDGER_SERVICE_URL"] = "http://custom-ledger:4000"
-        
+
         # Need to reload the class to pick up the new base_uri
         load "#{Rails.root}/app/services/ledger_service.rb"
-        
+
         example.run
-        
+
         ENV["LEDGER_SERVICE_URL"] = original_url
         # Reload again to restore original base_uri
         load "#{Rails.root}/app/services/ledger_service.rb"
@@ -245,4 +245,3 @@ RSpec.describe LedgerService,type: :service do
     end
   end
 end
-
