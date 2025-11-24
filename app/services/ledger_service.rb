@@ -14,7 +14,7 @@ class LedgerService
     }
   end
 
-  def get_available_balances
+  def available_balances
     response = self.class.get("/api/v1/balances/available", options)
     handle_response(response)
   rescue HTTParty::Error => e
