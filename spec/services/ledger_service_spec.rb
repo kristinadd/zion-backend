@@ -1,9 +1,9 @@
 require "rails_helper"
 
-RSpec.describe LedgerService do
+RSpec.describe LedgerService,type: :service do
   let(:service) { described_class.new }
 
-  describe "#get_available_balances" do
+  describe "#available_balances" do
     context "when the request is successful" do
       let(:success_response) do
         {
@@ -24,14 +24,14 @@ RSpec.describe LedgerService do
       end
 
       it "returns success with parsed data" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be true
         expect(result[:data]).to eq(success_response)
       end
 
       it "does not include error fields" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result).not_to have_key(:error)
         expect(result).not_to have_key(:error_type)
@@ -51,20 +51,20 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with client_error type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:client_error)
       end
 
       it "includes the upstream status code" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:status_code]).to eq(400)
       end
 
       it "includes the error message from upstream" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:message]).to eq(error_response)
       end
@@ -83,14 +83,14 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with server_error type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:server_error)
       end
 
       it "includes the upstream status code" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:status_code]).to eq(500)
       end
@@ -103,14 +103,14 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with connection_refused type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:connection_refused)
       end
 
       it "includes a descriptive error message" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:error]).to include("unavailable")
       end
@@ -123,7 +123,7 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with connection_timeout type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:connection_timeout)
@@ -137,7 +137,7 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with read_timeout type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:read_timeout)
@@ -151,7 +151,7 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with network_error type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:network_error)
@@ -165,7 +165,7 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with http_error type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:http_error)
@@ -179,14 +179,14 @@ RSpec.describe LedgerService do
       end
 
       it "returns failure with unexpected_response type" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:success]).to be false
         expect(result[:error_type]).to eq(:unexpected_response)
       end
 
       it "includes the unexpected status code" do
-        result = service.get_available_balances
+        result = service.available_balances
 
         expect(result[:status_code]).to eq(999)
       end
@@ -196,8 +196,15 @@ RSpec.describe LedgerService do
       around do |example|
         original_url = ENV["LEDGER_SERVICE_URL"]
         ENV["LEDGER_SERVICE_URL"] = "http://custom-ledger:4000"
+        
+        # Need to reload the class to pick up the new base_uri
+        load "#{Rails.root}/app/services/ledger_service.rb"
+        
         example.run
+        
         ENV["LEDGER_SERVICE_URL"] = original_url
+        # Reload again to restore original base_uri
+        load "#{Rails.root}/app/services/ledger_service.rb"
       end
 
       before do
@@ -210,7 +217,8 @@ RSpec.describe LedgerService do
       end
 
       it "uses the custom URL from environment variable" do
-        result = service.get_available_balances
+        custom_service = LedgerService.new
+        result = custom_service.available_balances
 
         expect(result[:success]).to be true
         expect(WebMock).to have_requested(:get, "http://custom-ledger:4000/api/v1/balances/available")
@@ -223,7 +231,7 @@ RSpec.describe LedgerService do
       stub_request(:get, "http://localhost:3000/api/v1/balances/available")
         .to_return(status: 200, body: {}.to_json)
 
-      service.get_available_balances
+      service.available_balances
 
       expect(WebMock).to have_requested(:get, "http://localhost:3000/api/v1/balances/available")
         .with(headers: {

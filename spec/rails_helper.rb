@@ -17,7 +17,10 @@ require 'capybara/rspec'
 # Require WebMock for HTTP request stubbing
 require 'webmock/rspec'
 
-# Configure WebMock to allow real HTTP requests for system tests
+# Configure WebMock
+# - Allow real HTTP for integration tests (tagged with type: :integration)
+# - Allow localhost for system tests
+# - Block all other external requests in unit tests
 WebMock.disable_net_connect!(allow_localhost: true)
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -100,6 +103,15 @@ RSpec.configure do |config|
 
   config.after(:each) do
     DatabaseCleaner.clean
+  end
+
+  # Allow real HTTP requests for integration tests
+  config.before(:each, type: :integration) do
+    WebMock.allow_net_connect!
+  end
+
+  config.after(:each, type: :integration) do
+    WebMock.disable_net_connect!(allow_localhost: true)
   end
 end
 

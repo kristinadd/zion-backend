@@ -3,7 +3,7 @@ module Api
     class LedgerController < ApplicationController
       def available_balances
         ledger_service = LedgerService.new
-        result = ledger_service.get_available_balances
+        result = ledger_service.available_balances
 
         if result[:success]
           render json: result[:data], status: :ok
