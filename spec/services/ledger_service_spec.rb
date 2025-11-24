@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe LedgerService, type: :service do
   let(:service) { described_class.new }
+  let(:endpoint_url) { "#{described_class.base_uri}/api/v1/balances/available" }
 
   describe "#available_balances" do
     context "when the request is successful" do
@@ -15,7 +16,7 @@ RSpec.describe LedgerService, type: :service do
       end
 
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_return(
             status: 200,
             body: success_response.to_json,
@@ -42,7 +43,7 @@ RSpec.describe LedgerService, type: :service do
       let(:error_response) { { "error" => "Invalid request" } }
 
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_return(
             status: 400,
             body: error_response.to_json,
@@ -74,7 +75,7 @@ RSpec.describe LedgerService, type: :service do
       let(:error_response) { { "error" => "Internal server error" } }
 
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_return(
             status: 500,
             body: error_response.to_json,
@@ -98,7 +99,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when the connection is refused" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_raise(Errno::ECONNREFUSED)
       end
 
@@ -118,7 +119,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when the connection times out" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_raise(Net::OpenTimeout)
       end
 
@@ -132,7 +133,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when reading the response times out" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_raise(Net::ReadTimeout)
       end
 
@@ -146,7 +147,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when there is a DNS/socket error" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_raise(SocketError)
       end
 
@@ -160,7 +161,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when HTTParty raises an error" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_raise(HTTParty::Error)
       end
 
@@ -174,7 +175,7 @@ RSpec.describe LedgerService, type: :service do
 
     context "when an unexpected status code is returned" do
       before do
-        stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+        stub_request(:get, endpoint_url)
           .to_return(status: 999)
       end
 
@@ -228,12 +229,12 @@ RSpec.describe LedgerService, type: :service do
 
   describe "request configuration" do
     it "sends appropriate headers" do
-      stub_request(:get, "http://localhost:3000/api/v1/balances/available")
+      stub_request(:get, endpoint_url)
         .to_return(status: 200, body: {}.to_json)
 
       service.available_balances
 
-      expect(WebMock).to have_requested(:get, "http://localhost:3000/api/v1/balances/available")
+      expect(WebMock).to have_requested(:get, endpoint_url)
         .with(headers: {
           "Content-Type" => "application/json",
           "Accept" => "application/json"
