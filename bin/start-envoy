@@ -1,0 +1,18 @@
+#!/bin/bash
+# Start Envoy Proxy
+# This script starts Envoy with the configuration in envoy/envoy.yaml
+
+echo "🚀 Starting Envoy Proxy..."
+echo "📊 Admin UI will be available at: http://localhost:9901"
+echo "🔌 Proxy listening on: http://localhost:15001"
+echo ""
+echo "Press Ctrl+C to stop Envoy"
+echo ""
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Start Envoy with our config
+envoy -c "$PROJECT_ROOT/envoy/envoy.yaml"
+

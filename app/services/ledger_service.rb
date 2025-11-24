@@ -1,6 +1,6 @@
 class LedgerService
   include HTTParty
-  base_uri ENV.fetch("LEDGER_SERVICE_URL", "http://localhost:3000")
+  base_uri ENV.fetch("LEDGER_SERVICE_URL", "http://localhost:15001")
 
   attr_reader :options
 
