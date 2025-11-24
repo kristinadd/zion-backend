@@ -41,7 +41,7 @@ gem "thruster", require: false
 gem "image_processing", "~> 1.2"
 
 # HTTP client for API calls [https://github.com/jnunemaker/httparty]
-gem "httparty", "~> 0.22.0"
+gem "httparty", "~> 0.23.2"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
