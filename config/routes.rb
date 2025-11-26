@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   # Ledger API proxy endpoints
   namespace :api do
     namespace :v1 do
-      get "ledger/balances/available", to: "ledger#available_balances"
+      get "balances/available", to: "ledger#available_balances"
     end
   end
 

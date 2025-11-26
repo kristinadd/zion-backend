@@ -40,7 +40,7 @@ static_resources:
               "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
               log_format:
                 text_format: |
-                  [RAILS EGRESS] [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                  [ZION-BACKEND EGRESS] [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
                   %RESPONSE_CODE% %DURATION%ms → %UPSTREAM_CLUSTER%
 
   # CLUSTERS: Where to send traffic
