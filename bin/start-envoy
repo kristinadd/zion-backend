@@ -1,18 +1,19 @@
 #!/bin/bash
-# Start Envoy Proxy
-# This script starts Envoy with the configuration in envoy/envoy.yaml
+# Start Envoy Sidecar for Rails App (Egress Proxy)
+# This sidecar handles OUTBOUND traffic from Rails to other services
 
-echo "🚀 Starting Envoy Proxy..."
-echo "📊 Admin UI will be available at: http://localhost:9901"
-echo "🔌 Proxy listening on: http://localhost:15001"
+echo "🚀 Starting Rails Envoy Sidecar (Egress)..."
+echo "📤 Handles outbound traffic from Rails app"
+echo "🔌 Listening on: http://localhost:15001"
+echo "📊 Admin UI: http://localhost:9901"
 echo ""
-echo "Press Ctrl+C to stop Envoy"
+echo "Press Ctrl+C to stop"
 echo ""
 
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Start Envoy with our config
+# Start Envoy with config
 envoy -c "$PROJECT_ROOT/envoy/envoy.yaml"
 
