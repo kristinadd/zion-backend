@@ -49,6 +49,48 @@ class LedgerService
     }
   end
 
+  def create_entry_set(entry_set_params)
+    # Generate idempotency key if not provided (basic implementation for now)
+    payload = entry_set_params.to_h
+    payload["idempotency_key"] ||= SecureRandom.uuid
+
+    response = self.class.post(
+      "/api/v1/entry_sets",
+      options.merge(body: payload.to_json)
+    )
+    handle_response(response)
+  rescue HTTParty::Error => e
+    {
+      success: false,
+      error_type: :http_error,
+      error: "HTTP request failed: #{e.message}"
+    }
+  rescue SocketError => e
+    {
+      success: false,
+      error_type: :network_error,
+      error: "Network error (DNS/socket): #{e.message}"
+    }
+  rescue Errno::ECONNREFUSED => e
+    {
+      success: false,
+      error_type: :connection_refused,
+      error: "Ledger service unavailable (connection refused)"
+    }
+  rescue Net::OpenTimeout => e
+    {
+      success: false,
+      error_type: :connection_timeout,
+      error: "Connection timeout - service may be down"
+    }
+  rescue Net::ReadTimeout => e
+    {
+      success: false,
+      error_type: :read_timeout,
+      error: "Read timeout - service is too slow"
+    }
+  end
+
   private
 
   def handle_response(response)
