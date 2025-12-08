@@ -35,6 +35,21 @@ static_resources:
                     key: "X-Internal-Secret"
                     value: "zion-internal-secret-2024"
                   append_action: OVERWRITE_IF_EXISTS_OR_ADD
+              - match:
+                  prefix: "/api/v1/entry_sets"
+                route:
+                  cluster: ledger_service_ingress
+                  timeout: 15s
+                  retry_policy:
+                    retry_on: "5xx,connect-failure,refused-stream"
+                    num_retries: 3
+                    per_try_timeout: 5s
+                # Add internal security header
+                request_headers_to_add:
+                - header:
+                    key: "X-Internal-Secret"
+                    value: "zion-internal-secret-2024"
+                  append_action: OVERWRITE_IF_EXISTS_OR_ADD
           http_filters:
           - name: envoy.filters.http.router
             typed_config:

@@ -13,6 +13,18 @@ module Api
         end
       end
 
+      def create_entry_set
+        ledger_service = LedgerService.new
+        result = ledger_service.create_entry_set(entry_set_params)
+
+        if result[:success]
+          render json: result[:data], status: :ok
+        else
+          log_ledger_error(result)
+          render json: error_response(result), status: http_status_for_error(result[:error_type])
+        end
+      end
+
       private
 
       def log_ledger_error(result)
@@ -48,6 +60,10 @@ module Api
         else
           :internal_server_error
         end
+      end
+
+      def entry_set_params
+        params.permit(:idempotency_key, :committed_at, :description, entries: [ :namespace, :name, :amount, :currency, :legal_entity, :account_id ])
       end
     end
   end
