@@ -63,7 +63,7 @@ module Api
       end
 
       def entry_set_params
-        params.permit(:idempotency_key, :committed_at, :description, entries: [:namespace, :name, :amount, :currency, :legal_entity, :account_id])
+        params.permit(:idempotency_key, :committed_at, :description, entries: [ :namespace, :name, :amount, :currency, :legal_entity, :account_id ])
       end
     end
   end
